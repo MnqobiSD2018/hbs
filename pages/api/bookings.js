@@ -5,6 +5,24 @@ import { getSession } from "next-auth/react";
 export default async function handler(req, res) {
   await dbConnect();
 
+  if (req.method === "GET") {
+    try {
+      const { userId } = req.query;
+      if (!userId) {
+        return res.status(400).json({ error: "User ID is required" });
+      }
+
+      const bookings = await Booking.find({ userId }).sort({ date: -1 });
+
+      return res.status(200).json({ success: true, data: bookings });
+    } catch (error) {
+      console.error("Error fetching bookings:", error);
+      return res.status(500).json({ success: false, error: "Failed to fetch bookings" });
+    }
+  } else {
+    return res.status(405).json({ success: false, error: "Method Not Allowed" });
+  }
+
   if (req.method === "POST") {
     try {
       const { appointmentType, doctor, date, time, description, nextOfKin, userId } = req.body;
@@ -33,6 +51,7 @@ export default async function handler(req, res) {
 } else {
 res.status(405).json({ error: "Method not allowed" });
 }
+
   
   /** const session = await getSession({ req });
 

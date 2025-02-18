@@ -83,6 +83,9 @@ export default function PatientDashboard() {
                     <button onClick={() => router.push("/patient-settings")} className="bg-gray-500 text-white p-4 rounded-lg w-full">
                          Settings
                     </button>
+                    <button onClick={() => router.push("/booking-history")} className="bg-gray-500 text-white p-4 rounded-lg w-full">
+                        View Booking History
+                    </button>
                 </div>
             </div>
         </div>
