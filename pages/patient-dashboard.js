@@ -8,6 +8,7 @@ export default function PatientDashboard() {
     const [menuOpen, setMenuOpen] = useState(false);
     const router = useRouter();
 
+
     const handleLogout = () => {
         localStorage.removeItem("user");
         router.push("/login");

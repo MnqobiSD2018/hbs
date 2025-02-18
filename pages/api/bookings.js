@@ -7,13 +7,14 @@ export default async function handler(req, res) {
 
   if (req.method === "POST") {
     try {
-      const { appointmentType, doctor, date, time, description, nextOfKin } = req.body;
+      const { appointmentType, doctor, date, time, description, nextOfKin, userId } = req.body;
 
       if (!appointmentType || !doctor || !date || !time || !description) {
         return res.status(400).json({ error: "All fields are required" });
     }
 
     const newBooking = new Booking({
+      userId,
       appointmentType,
       doctor,
       date,
@@ -24,6 +25,7 @@ export default async function handler(req, res) {
      
   await newBooking.save();
   res.status(201).json({ message: "Booking successful" });
+  console.log("Booking successful", req.body);
 } catch (error) {
   console.error("Booking Error:", error);
   res.status(500).json({ error: "Failed to create booking" });

@@ -11,6 +11,8 @@ export default function GeneralCheckup() {
         nextOfKinPhone: "",
     });
 
+    const user = JSON.parse(localStorage.getItem("user"));
+
     useEffect(() => {
         const fetchDoctors = async () => {
             try {
@@ -30,6 +32,7 @@ export default function GeneralCheckup() {
         
         
         const bookingData = {
+            userId: user.id,
             appointmentType: "General Checkup",
         doctor: formData.doctor, 
         date: formData.date,
