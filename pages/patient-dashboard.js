@@ -80,6 +80,9 @@ export default function PatientDashboard() {
                     <button onClick={() => router.push("./appointments/vaccination")} className="bg-purple-500 text-white p-4 rounded-lg w-full">
                         Vaccination Booking
                     </button>
+                    <button onClick={() => router.push("/patient-settings")} className="bg-gray-500 text-white p-4 rounded-lg w-full">
+                         Settings
+                    </button>
                 </div>
             </div>
         </div>
