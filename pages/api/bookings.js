@@ -1,5 +1,6 @@
 import dbConnect from "../../lib/mongodb";
 import Booking from "../../models/Booking";
+import Doctor from "../../models/Doctors"; // Import the Doctor model
 import { getSession } from "next-auth/react";
 
 export default async function handler(req, res) {
@@ -12,15 +13,18 @@ export default async function handler(req, res) {
         return res.status(400).json({ error: "User ID is required" });
       }
 
-      const bookings = await Booking.find({ userId }).sort({ date: -1 });
+      const bookings = await Booking.find({ userId })
+        .populate("doctor", "name specialty") // Fetch doctor details
+        .sort({ date: -1 });
 
+      console.log("Bookings with populated doctors:", bookings);  // Add this log
       return res.status(200).json({ success: true, data: bookings });
     } catch (error) {
       console.error("Error fetching bookings:", error);
       return res.status(500).json({ success: false, error: "Failed to fetch bookings" });
     }
   } 
-  else if (req.method === "POST") { // 🔥 FIX: This was unreachable before!
+  else if (req.method === "POST") { // This was unreachable before! Check Github Commit History
     try {
       const { appointmentType, doctor, date, time, description, nextOfKin, userId } = req.body;
 
@@ -28,6 +32,12 @@ export default async function handler(req, res) {
         return res.status(400).json({ error: "All fields are required" });
       }
 
+      // Ensure doctor is stored as ObjectId
+      const doctorExists = await Doctor.findById(doctor);
+      if (!doctorExists) {
+        return res.status(400).json({ error: "Doctor not found" });
+      }
+      
       const newBooking = new Booking({
         userId,
         appointmentType,

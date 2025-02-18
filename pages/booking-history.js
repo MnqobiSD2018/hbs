@@ -7,25 +7,31 @@ export default function BookingHistory() {
 
   useEffect(() => {
     const fetchBookings = async () => {
-      setLoading(true);
-      setError(null);
-
-      const storedUser = JSON.parse(localStorage.getItem("user"));
-      if (!storedUser || !storedUser.id) {
-        setError("User not found. Please log in again.");
-        setLoading(false);
-        return;
-      }
-
       try {
-        const res = await fetch(`/api/bookings?userId=${storedUser.id}`);
-        const result = await res.json();
+        // Ensure localStorage access only happens in the browser
+        if (typeof window !== "undefined") {
+          const storedUser = JSON.parse(localStorage.getItem("user"));
 
-        if (!res.ok) {
-          throw new Error(result.error || "Failed to fetch bookings.");
+          // Check if storedUser exists before using it
+          if (!storedUser || !storedUser.id) {
+            setError("User not found. Please log in again.");
+            setLoading(false);
+            return;
+          }
+
+          const res = await fetch(`/api/bookings?userId=${storedUser.id}`, {
+            headers: { "Cache-Control": "no-cache, no-store, must-revalidate" },
+          });
+
+          const result = await res.json();
+
+          if (!res.ok) {
+            throw new Error(result.error || "Failed to fetch bookings.");
+          }
+
+          console.log("Fetched bookings:", result.data); // Debugging log
+          setBookings(result.data || []);
         }
-
-        setBookings(result.data || []); // Ensure an array is set
       } catch (error) {
         console.error("Error fetching bookings:", error);
         setError(error.message);
@@ -50,7 +56,7 @@ export default function BookingHistory() {
           {bookings.map((booking) => (
             <div key={booking._id} className="border p-4 rounded-lg shadow-md">
               <p><strong>Appointment Type:</strong> {booking.appointmentType}</p>
-              <p><strong>Doctor:</strong> {booking.doctor}</p>
+              <p><strong>Doctor:</strong> {booking.doctor?.name || "Unknown"} ({booking.doctor?.specialty || "N/A"})</p>
               <p><strong>Date:</strong> {booking.date}</p>
               <p><strong>Time:</strong> {booking.time}</p>
               {booking.description && <p><strong>Description:</strong> {booking.description}</p>}

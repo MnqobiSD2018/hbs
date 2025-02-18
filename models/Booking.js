@@ -3,8 +3,8 @@ import mongoose from "mongoose";
 const BookingSchema = new mongoose.Schema({
   userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
   appointmentType: { type: String, required: true }, // General Checkup, Specialist Visit, etc.
-  doctor: { type: String, required: true },
-  date: { type: String, required: true },
+  doctor: { type: mongoose.Schema.Types.ObjectId, ref: "Doctor", required: true },
+  date: { type: Date, required: true },
   time: { type: String, required: true },
   description: { type: String },
   nextOfKin: {
