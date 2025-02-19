@@ -1,10 +1,16 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
-import loginpage  from "./login";
+import Loginpage  from "./login";
 
 export default function Home() {
-  
-const [doctors, setDoctors] = useState([]);
+  return(
+    <Loginpage/>
+  );
+
+}
+
+/**
+  const [doctors, setDoctors] = useState([]);
   const [appointments, setAppointments] = useState([]);
   const router = useRouter();
 
@@ -83,8 +89,4 @@ const [doctors, setDoctors] = useState([]);
                 <p className="text-gray-500">No doctors available.</p>
             )}
         </div>
-  );
-}
-
-/**
   ); */
