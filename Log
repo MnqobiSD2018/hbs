@@ -1,0 +1,25 @@
+201 - CREATED - The request was successful. We created a new resource and the response body contains the representation.
+{
+  "account_sid": "AC473e4d42678c4b87e23c67b5908bd029",
+  "api_version": "2010-04-01",
+  "body": "Sent from your Twilio trial account - Appointment booked for 2025/02/21\nwith doctor Dr. Nick",
+  "date_created": "Thu, 20 Feb 2025 13:25:57 +0000",
+  "date_sent": null,
+  "date_updated": "Thu, 20 Feb 2025 13:25:57 +0000",
+  "direction": "outbound-api",
+  "error_code": null,
+  "error_message": null,
+  "from": "+17752548812",
+  "messaging_service_sid": null,
+  "num_media": "0",
+  "num_segments": "1",
+  "price": null,
+  "price_unit": "USD",
+  "sid": "SMd379b17285d31af7270adbb8c05ed3eb",
+  "status": "queued",
+  "subresource_uris": {
+    "media": "/2010-04-01/Accounts/AC473e4d42678c4b87e23c67b5908bd029/Messages/SMd379b17285d31af7270adbb8c05ed3eb/Media.json"
+  },
+  "to": "+263788077462",
+  "uri": "/2010-04-01/Accounts/AC473e4d42678c4b87e23c67b5908bd029/Messages/SMd379b17285d31af7270adbb8c05ed3eb.json"
+}

@@ -1,10 +1,13 @@
 import { useState } from "react";
 import { useRouter } from "next/router";
+import PhoneInput from 'react-phone-input-2'
+import 'react-phone-input-2/lib/style.css'
 
 export default function Register() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [phoneNumber, setphoneNumber] = useState("");
   const [role, setRole] = useState("patient");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -14,16 +17,22 @@ export default function Register() {
     e.preventDefault();
 
     try {
+
       const response = await fetch("/api/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, password, role }),
+        body: JSON.stringify({ name, email, password, phoneNumber, role }),
       });
+
+      const userdata = JSON.stringify({ name, email, password, phoneNumber, role });
+      console.log("Collected user data is ", userdata);
 
       const data = await response.json();
 
+
       if (response.ok) {
         setSuccess("User registered successfully!");
+        console.log("Response is okay");
         setError("");
         setTimeout(() => router.push("/login"), 2000); // Redirect to login
       } else {
@@ -63,6 +72,17 @@ export default function Register() {
             className="p-2 border rounded mb-2"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+          <PhoneInput
+            country={'zw'}
+            type=""
+            placeholder="788077462"
+            className="p-2 border rounded mb-2"
+            value={phoneNumber}
+            onChange={setphoneNumber}
+            //onChange={(e) => setphoneNumber(e.target.value)}
+            //onChange={setphoneNumber => this.setState({setphoneNumber})}
             required
           />
           <select

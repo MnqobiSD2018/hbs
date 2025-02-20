@@ -6,6 +6,7 @@ import { Menu, X } from "lucide-react"; // Import icons
 export default function PatientDashboard() {
     const [user, setUser] = useState(null);
     const [menuOpen, setMenuOpen] = useState(false);
+    const [phoneMissing, setPhoneMissing] = useState(false);
     const router = useRouter();
 
 
@@ -23,6 +24,12 @@ export default function PatientDashboard() {
         } else {
             console.log("User loaded from storage:", loggedInUser); 
             setUser(loggedInUser);
+            console.log("User Phone number is", loggedInUser.phoneNumber);
+
+            // Check if phone number is missing
+            if (!loggedInUser.phoneNumber || loggedInUser.phoneNumber.trim() === "") {
+                setPhoneMissing(true);
+            }
         }
     }, []);
     
@@ -30,11 +37,15 @@ export default function PatientDashboard() {
         return <p>Loading...</p>; // Prevents flashing before redirect
     }
 
-    const loggedInUsertest = JSON.parse(localStorage.getItem("user"));
-
-    console.log(loggedInUsertest.name);
-   
-
+    // Function to check phone number before navigation
+    const handleNavigation = (path) => {
+        if (phoneMissing) {
+            alert("Please update your phone number in settings before making a booking.");
+            router.push("/patient-settings");
+            return;
+        }
+        router.push(path);
+    };
     return (
         <div className="min-h-screen bg-gray-100">
             {/* Navbar */}
@@ -67,17 +78,22 @@ export default function PatientDashboard() {
 
             {/* Booking Options */}
             <div className="flex flex-col items-center p-6">
+                {phoneMissing && (
+                    <p className="text-red-500 mb-4">
+                        You must enter a phone number in settings before booking an appointment.
+                    </p>
+                )}
                 <div className="grid grid-cols-2 gap-6 w-full max-w-lg mt-6">
-                    <button onClick={() => router.push("./appointments/general-checkup")} className="bg-blue-500 text-white p-4 rounded-lg w-full">
+                    <button onClick={() => handleNavigation("./appointments/general-checkup")} className="bg-blue-500 text-white p-4 rounded-lg w-full">
                         General Checkup
                     </button>
-                    <button onClick={() => router.push("./appointments/specialist-visit")} className="bg-green-500 text-white p-4 rounded-lg w-full">
+                    <button onClick={() => handleNavigation("./appointments/specialist-visit")} className="bg-green-500 text-white p-4 rounded-lg w-full">
                         Specialist Visit
                     </button>
-                    <button onClick={() => router.push("./appointments/book-for-someone")} className="bg-yellow-500 text-white p-4 rounded-lg w-full">
+                    <button onClick={() => handleNavigation("./appointments/book-for-someone")} className="bg-yellow-500 text-white p-4 rounded-lg w-full">
                         Book for Someone Else
                     </button>
-                    <button onClick={() => router.push("./appointments/vaccination")} className="bg-purple-500 text-white p-4 rounded-lg w-full">
+                    <button onClick={() => handleNavigation("./appointments/vaccination")} className="bg-purple-500 text-white p-4 rounded-lg w-full">
                         Vaccination Booking
                     </button>
                     <button onClick={() => router.push("/patient-settings")} className="bg-gray-500 text-white p-4 rounded-lg w-full">
