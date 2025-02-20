@@ -4,32 +4,30 @@ export default function BookingHistory() {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [editingBooking, setEditingBooking] = useState(null); // Track editing state
+  const [editingBooking, setEditingBooking] = useState(null);
   const [editedData, setEditedData] = useState({});
 
   useEffect(() => {
     const fetchBookings = async () => {
       try {
-        if (typeof window !== "undefined") {
-          const storedUser = JSON.parse(localStorage.getItem("user"));
-          if (!storedUser || !storedUser.id) {
-            setError("User not found. Please log in again.");
-            setLoading(false);
-            return;
-          }
-
-          const res = await fetch(`/api/bookings?userId=${storedUser.id}`, {
-            headers: { "Cache-Control": "no-cache, no-store, must-revalidate" },
-          });
-
-          const result = await res.json();
-
-          if (!res.ok) {
-            throw new Error(result.error || "Failed to fetch bookings.");
-          }
-
-          setBookings(result.data || []);
+        const storedUser = JSON.parse(localStorage.getItem("user"));
+        if (!storedUser || !storedUser.id) {
+          setError("User not found. Please log in again.");
+          setLoading(false);
+          return;
         }
+
+        const res = await fetch(`/api/bookings?userId=${storedUser.id}`, {
+          headers: { "Cache-Control": "no-cache, no-store, must-revalidate" },
+        });
+
+        const result = await res.json();
+
+        if (!res.ok) {
+          throw new Error(result.error || "Failed to fetch bookings.");
+        }
+
+        setBookings(result.data || []);
       } catch (error) {
         console.error("Error fetching bookings:", error);
         setError(error.message);
@@ -41,7 +39,6 @@ export default function BookingHistory() {
     fetchBookings();
   }, []);
 
-  // Delete booking function
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this booking?")) return;
 
@@ -49,18 +46,17 @@ export default function BookingHistory() {
       const res = await fetch(`/api/bookings/${id}`, { method: "DELETE" });
 
       if (!res.ok) {
-        const errorData = await res.json(); // Get error message from server
+        const errorData = await res.json();
         console.error("Delete error response:", errorData);
         throw new Error(errorData.error || "Failed to delete booking.");
       }
-      
+
       setBookings((prev) => prev.filter((booking) => booking._id !== id));
     } catch (error) {
       console.error("Error deleting booking:", error);
     }
   };
 
-  // Start editing a booking
   const handleEdit = (booking) => {
     setEditingBooking(booking._id);
     setEditedData({
@@ -70,33 +66,46 @@ export default function BookingHistory() {
     });
   };
 
-  // Handle form input changes for editing
   const handleChange = (e) => {
     setEditedData({ ...editedData, [e.target.name]: e.target.value });
   };
 
-  // Save edited booking
   const handleSave = async (id) => {
     try {
-      const res = await fetch(`/api/bookings/${id}`, {
+      console.log("Saving edited data:", editedData);
+  
+      const res = await fetch('/api/bookings/${id}', {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify(editedData),
       });
-
-      if (!res.ok) throw new Error("Failed to update booking.");
-
+  
+      if (!res.ok) {
+        console.error("Update error response:", res);
+        const errorData = await res.json();
+        console.error("Error details:", errorData);
+        throw new Error(errorData.error || "Failed to update booking.");
+      }
+  
+      const updatedBooking = await res.json();
+      console.log("Updated Booking:", updatedBooking);
+  
       setBookings((prev) =>
         prev.map((booking) =>
-          booking._id === id ? { ...booking, ...editedData } : booking
+          booking._id === id ? { ...booking, ...updatedBooking } : booking
         )
       );
+  
       setEditingBooking(null);
     } catch (error) {
       console.error("Error updating booking:", error);
-    }
+      alert("Failed to update booking: " +error.message);
+    }
   };
-
+    
+  
   if (loading) return <p>Loading booking history...</p>;
   if (error) return <p className="text-red-500">{error}</p>;
 
