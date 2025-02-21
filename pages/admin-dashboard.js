@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import ManageDoctors from "@/components/ManageDoctors";
+import Appointments from "@/components/Appointments";
+import Patients from "@/components/Patients";
 
 export default function AdminDashboard() {
     const [activeTab, setActiveTab] = useState("doctors");
@@ -43,6 +45,12 @@ export default function AdminDashboard() {
                     >
                         View Appointments
                     </li>
+                    <li
+                        className={`p-2 cursor-pointer ${activeTab === "patients" ? "bg-gray-700" : ""}`}
+                        onClick={() => setActiveTab("patients")}
+                    >
+                        Patients
+                    </li>
                 </ul>
                 <button
                     onClick={handleLogout}
@@ -56,6 +64,7 @@ export default function AdminDashboard() {
             <div className="flex-1 p-6">
                 {activeTab === "doctors" && <ManageDoctors />}
                 {activeTab === "appointments" && <p>Appointments Management (Coming Soon)</p>}
+                {activeTab === "patients" && <Patients/>}
             </div>
         </div>
     );

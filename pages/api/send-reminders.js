@@ -48,13 +48,28 @@ export default async function handler(req, res) {
         continue;
       }
 
-      const message = `Reminder: Your appointment with Dr. ${doctor.name} is scheduled for ${moment(date).format(
-        "MMMM Do YYYY"
-      )}. Details: ${description || "No description provided."}`;
+     if (!phoneNumber.includes('+')){
+        const newphoneNumber = '+' + phoneNumber;
+        const message = `Reminder: Your appointment with Dr. ${doctor.name} is scheduled for ${moment(date).format(
+            "MMMM Do YYYY"
+          )}. Details: ${description || "No description provided."}`;
+    
+          console.log(`Sending reminder to: ${newphoneNumber}`);
+    
+          await sendSms(newphoneNumber, message);
 
-      console.log(`Sending reminder to: ${phoneNumber}`);
 
-      await sendSms(phoneNumber, message)
+     } else if (phoneNumber.includes('+')){
+        const message = `Reminder: Your appointment with Dr. ${doctor.name} is scheduled for ${moment(date).format(
+            "MMMM Do YYYY"
+          )}. Details: ${description || "No description provided."}`;
+    
+          console.log(`Sending reminder to: ${phoneNumber}`);
+    
+          await sendSms(phoneNumber, message);
+     }
+
+      
 
       //console.log("Sending reminder to:", phoneNumber);
       //alert("Sending reminder to:" + phoneNumber + "Message is: " + message);
