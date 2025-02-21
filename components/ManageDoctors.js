@@ -65,56 +65,67 @@ export default function ManageDoctors() {
     };
 
     return (
-        <div>
-            <h1 className="text-2xl font-bold mb-4">Manage Doctors</h1>
+        <div className="max-w-4xl mx-auto p-6 bg-white shadow-lg rounded-lg">
+            <h1 className="text-3xl font-bold mb-6 text-center text-gray-800">Manage Doctors</h1>
 
             {/* Add Doctor Form */}
-            <div className="border p-4 rounded mb-4 bg-gray-100">
-                <h2 className="text-lg font-semibold">Add New Doctor</h2>
-                <input
-                    type="text"
-                    placeholder="Doctor's Name"
-                    value={newDoctor.name}
-                    onChange={(e) => setNewDoctor({ ...newDoctor, name: e.target.value })}
-                    className="border p-2 rounded w-full mt-2"
-                />
-                <input
-                    type="text"
-                    placeholder="Specialty"
-                    value={newDoctor.specialty}
-                    onChange={(e) => setNewDoctor({ ...newDoctor, specialty: e.target.value })}
-                    className="border p-2 rounded w-full mt-2"
-                />
-                <input
-                    type="text"
-                    placeholder="Available Hours (e.g., 9-17)"
-                    value={newDoctor.availableHours}
-                    onChange={(e) => setNewDoctor({ ...newDoctor, availableHours: e.target.value })}
-                    className="border p-2 rounded w-full mt-2"
-                />
+            <div className="bg-gray-100 p-6 rounded-lg mb-6 shadow-md">
+                <h2 className="text-xl font-semibold text-gray-700 mb-4">Add New Doctor</h2>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <input
+                        type="text"
+                        placeholder="Doctor's Name"
+                        value={newDoctor.name}
+                        onChange={(e) => setNewDoctor({ ...newDoctor, name: e.target.value })}
+                        className="border p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-400"
+                    />
+                    <input
+                        type="text"
+                        placeholder="Specialty"
+                        value={newDoctor.specialty}
+                        onChange={(e) => setNewDoctor({ ...newDoctor, specialty: e.target.value })}
+                        className="border p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-400"
+                    />
+                    <input
+                        type="text"
+                        placeholder="Available Hours (e.g., 9-17)"
+                        value={newDoctor.availableHours}
+                        onChange={(e) => setNewDoctor({ ...newDoctor, availableHours: e.target.value })}
+                        className="border p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-400"
+                    />
+                </div>
                 <button
                     onClick={handleAddDoctor}
-                    className="mt-4 bg-blue-500 text-white p-2 rounded w-full"
+                    className="mt-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg w-full transition duration-200"
                 >
                     Add Doctor
                 </button>
             </div>
 
             {/* Display Doctors */}
-            {doctors.map((doctor) => (
-                <div key={doctor._id} className="border p-4 rounded mb-4 flex justify-between items-center">
-                    <div>
-                        <p className="text-lg font-semibold">{doctor.name} - {doctor.specialty}</p>
-                        <p>Available Hours: {doctor.availableHours}</p>
-                    </div>
-                    <button
-                        onClick={() => handleDeleteDoctor(doctor._id)}
-                        className="bg-red-500 text-white px-3 py-2 rounded"
-                    >
-                        Delete
-                    </button>
-                </div>
-            ))}
+            <div className="space-y-4">
+                {doctors.length === 0 ? (
+                    <p className="text-center text-gray-500">No doctors available.</p>
+                ) : (
+                    doctors.map((doctor) => (
+                        <div
+                            key={doctor._id}
+                            className="bg-gray-50 p-4 rounded-lg shadow flex justify-between items-center border"
+                        >
+                            <div>
+                                <p className="text-lg font-semibold text-gray-800">{doctor.name} - {doctor.specialty}</p>
+                                <p className="text-gray-600">Available Hours: {doctor.availableHours}</p>
+                            </div>
+                            <button
+                                onClick={() => handleDeleteDoctor(doctor._id)}
+                                className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition duration-200"
+                            >
+                                Delete
+                            </button>
+                        </div>
+                    ))
+                )}
+            </div>
         </div>
     );
 }
