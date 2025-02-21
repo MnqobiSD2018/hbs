@@ -29,27 +29,27 @@ export default function GeneralCheckup() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        
-        
+
         const bookingData = {
             userId: user.id,
             appointmentType: "General Checkup",
-        doctor: formData.doctor, 
-        date: formData.date,
-        time: formData.time,
-        description: formData.description,
-        nextOfKin: { 
-            name: formData.nextOfKinName, 
-            phone: formData.nextOfKinPhone },
-          };
+            doctor: formData.doctor,
+            date: formData.date,
+            time: formData.time,
+            description: formData.description,
+            nextOfKin: { 
+                name: formData.nextOfKinName, 
+                phone: formData.nextOfKinPhone 
+            },
+        };
 
-          try {
+        try {
             const response = await fetch("/api/bookings", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(bookingData),
             });
-    
+
             if (response.ok) {
                 alert("Booking successful!");
                 setFormData({ date: "", time: "", doctor: "", description: "", nextOfKinName: "", nextOfKinPhone: "" });
@@ -59,88 +59,90 @@ export default function GeneralCheckup() {
         } catch (error) {
             console.error("Error booking appointment:", error);
         }
-
     };
-   
+
     return (
-        <div className="max-w-lg mx-auto p-6 bg-white shadow-lg rounded-lg">
-            <h1 className="text-2xl font-bold mb-4">General Checkup Booking</h1>
-            <form onSubmit={handleSubmit} className="space-y-4">
-                <label className="block">
-                    <span>Date of Appointment</span>
-                    <input
-                        type="date"
-                        value={formData.date}
-                        onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                        className="border p-2 rounded w-full"
-                        required
-                    />
-                </label>
+        <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
+            <div className="max-w-lg w-full bg-white p-6 rounded-lg shadow-lg">
+                <h1 className="text-3xl font-bold text-center text-blue-600 mb-6">Book a General Checkup</h1>
 
-                <label className="block">
-                    <span>Time of Appointment</span>
-                    <input
-                        type="time"
-                        value={formData.time}
-                        onChange={(e) => setFormData({ ...formData, time: e.target.value })}
-                        className="border p-2 rounded w-full"
-                        required
-                    />
-                </label>
+                <form onSubmit={handleSubmit} className="space-y-4">
+                    <div className="flex flex-col">
+                        <label className="text-gray-700 font-medium">Date of Appointment</label>
+                        <input
+                            type="date"
+                            value={formData.date}
+                            onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+                            className="border p-3 rounded-lg w-full focus:ring focus:ring-blue-300"
+                            required
+                        />
+                    </div>
 
-                <label className="block">
-                    <span>Doctor</span>
-                    <select
-                    value={formData.doctor}
-                    onChange={(e) => setFormData({ ...formData, doctor: e.target.value })}
-                    className="border p-2 rounded w-full"
-                    required
-                    >
-                    <option value="">Select a Doctor</option>
-                    {doctors.map((doctor) => (
-                        <option key={doctor._id} value={doctor._id}>
-                            {doctor.name} ({doctor.specialty})
-                        </option>
-                    ))}
-                    </select>
-                </label>
+                    <div className="flex flex-col">
+                        <label className="text-gray-700 font-medium">Time of Appointment</label>
+                        <input
+                            type="time"
+                            value={formData.time}
+                            onChange={(e) => setFormData({ ...formData, time: e.target.value })}
+                            className="border p-3 rounded-lg w-full focus:ring focus:ring-blue-300"
+                            required
+                        />
+                    </div>
 
-                <label className="block">
-                    <span>Description of Checkup</span>
-                    <textarea
-                        value={formData.description}
-                        onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                        className="border p-2 rounded w-full"
-                        required
-                    />
-                </label>
+                    <div className="flex flex-col">
+                        <label className="text-gray-700 font-medium">Doctor</label>
+                        <select
+                            value={formData.doctor}
+                            onChange={(e) => setFormData({ ...formData, doctor: e.target.value })}
+                            className="border p-3 rounded-lg w-full focus:ring focus:ring-blue-300"
+                            required
+                        >
+                            <option value="">Select a Doctor</option>
+                            {doctors.map((doctor) => (
+                                <option key={doctor._id} value={doctor._id}>
+                                    {doctor.name} ({doctor.specialty})
+                                </option>
+                            ))}
+                        </select>
+                    </div>
 
-                <label className="block">
-                    <span>Next of Kin Name</span>
-                    <input
-                        type="text"
-                        value={formData.nextOfKinName}
-                        onChange={(e) => setFormData({ ...formData, nextOfKinName: e.target.value })}
-                        className="border p-2 rounded w-full"
-                        required
-                    />
-                </label>
+                    <div className="flex flex-col">
+                        <label className="text-gray-700 font-medium">Description of Checkup</label>
+                        <textarea
+                            value={formData.description}
+                            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                            className="border p-3 rounded-lg w-full h-24 focus:ring focus:ring-blue-300"
+                            required
+                        />
+                    </div>
 
-                <label className="block">
-                    <span>Next of Kin Phone Number</span>
-                    <input
-                        type="tel"
-                        value={formData.nextOfKinPhone}
-                        onChange={(e) => setFormData({ ...formData, nextOfKinPhone: e.target.value })}
-                        className="border p-2 rounded w-full"
-                        required
-                    />
-                </label>
+                    <div className="flex flex-col">
+                        <label className="text-gray-700 font-medium">Next of Kin Name</label>
+                        <input
+                            type="text"
+                            value={formData.nextOfKinName}
+                            onChange={(e) => setFormData({ ...formData, nextOfKinName: e.target.value })}
+                            className="border p-3 rounded-lg w-full focus:ring focus:ring-blue-300"
+                            required
+                        />
+                    </div>
 
-                <button type="submit" className="w-full bg-blue-500 text-white p-2 rounded">
-                    Book Appointment
-                </button>
-            </form>
+                    <div className="flex flex-col">
+                        <label className="text-gray-700 font-medium">Next of Kin Phone Number</label>
+                        <input
+                            type="tel"
+                            value={formData.nextOfKinPhone}
+                            onChange={(e) => setFormData({ ...formData, nextOfKinPhone: e.target.value })}
+                            className="border p-3 rounded-lg w-full focus:ring focus:ring-blue-300"
+                            required
+                        />
+                    </div>
+
+                    <button type="submit" className="w-full bg-gradient-to-r from-blue-500 to-blue-700 text-white p-3 rounded-lg font-semibold hover:opacity-90 transition">
+                        Book Appointment
+                    </button>
+                </form>
+            </div>
         </div>
     );
 }
