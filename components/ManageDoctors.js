@@ -2,7 +2,12 @@ import { useState, useEffect } from "react";
 
 export default function ManageDoctors() {
     const [doctors, setDoctors] = useState([]);
-    const [newDoctor, setNewDoctor] = useState({ name: "", specialty: "", availableHours: "" });
+    const [newDoctor, setNewDoctor] = useState({
+        name: "",
+        specialization: "",
+        availableSlots: "",
+        workingHours: [{ day: "", startTime: "", endTime: "" }],
+    });
 
     useEffect(() => {
         fetchDoctors();
@@ -19,7 +24,7 @@ export default function ManageDoctors() {
     };
 
     const handleAddDoctor = async () => {
-        if (!newDoctor.name || !newDoctor.specialty || !newDoctor.availableHours) {
+        if (!newDoctor.name || !newDoctor.specialization || !newDoctor.availableSlots || newDoctor.workingHours.length === 0) {
             alert("Please fill in all fields.");
             return;
         }
@@ -28,13 +33,23 @@ export default function ManageDoctors() {
             const res = await fetch("../api/doctors", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(newDoctor),
+                body: JSON.stringify({
+                    name: newDoctor.name,
+                    specialization: newDoctor.specialization,
+                    availableSlots: newDoctor.availableSlots.split(",").map(slot => slot.trim()),
+                    workingHours: newDoctor.workingHours,
+                }),
             });
 
             if (res.ok) {
                 alert("Doctor added successfully!");
-                setNewDoctor({ name: "", specialty: "", availableHours: "" });
-                fetchDoctors(); // Refresh doctors list
+                setNewDoctor({
+                    name: "",
+                    specialization: "",
+                    availableSlots: "",
+                    workingHours: [{ day: "", startTime: "", endTime: "" }],
+                });
+                fetchDoctors();
             } else {
                 alert("Failed to add doctor");
             }
@@ -54,7 +69,7 @@ export default function ManageDoctors() {
 
                 if (res.ok) {
                     alert("Doctor deleted successfully!");
-                    fetchDoctors(); // Refresh doctors list
+                    fetchDoctors();
                 } else {
                     alert("Failed to delete doctor");
                 }
@@ -64,6 +79,19 @@ export default function ManageDoctors() {
         }
     };
 
+    const handleWorkingHoursChange = (index, field, value) => {
+        const updatedHours = [...newDoctor.workingHours];
+        updatedHours[index][field] = value;
+        setNewDoctor({ ...newDoctor, workingHours: updatedHours });
+    };
+
+    const addWorkingHourField = () => {
+        setNewDoctor({
+            ...newDoctor,
+            workingHours: [...newDoctor.workingHours, { day: "", startTime: "", endTime: "" }],
+        });
+    };
+
     return (
         <div className="max-w-4xl mx-auto p-6 bg-white shadow-lg rounded-lg">
             <h1 className="text-3xl font-bold mb-6 text-center text-gray-800">Manage Doctors</h1>
@@ -71,7 +99,7 @@ export default function ManageDoctors() {
             {/* Add Doctor Form */}
             <div className="bg-gray-100 p-6 rounded-lg mb-6 shadow-md">
                 <h2 className="text-xl font-semibold text-gray-700 mb-4">Add New Doctor</h2>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <input
                         type="text"
                         placeholder="Doctor's Name"
@@ -81,19 +109,54 @@ export default function ManageDoctors() {
                     />
                     <input
                         type="text"
-                        placeholder="Specialty"
-                        value={newDoctor.specialty}
-                        onChange={(e) => setNewDoctor({ ...newDoctor, specialty: e.target.value })}
+                        placeholder="Specialization"
+                        value={newDoctor.specialization}
+                        onChange={(e) => setNewDoctor({ ...newDoctor, specialization: e.target.value })}
                         className="border p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-400"
                     />
                     <input
                         type="text"
-                        placeholder="Available Hours (e.g., 9-17)"
-                        value={newDoctor.availableHours}
-                        onChange={(e) => setNewDoctor({ ...newDoctor, availableHours: e.target.value })}
+                        placeholder="Available Slots (comma-separated)"
+                        value={newDoctor.availableSlots}
+                        onChange={(e) => setNewDoctor({ ...newDoctor, availableSlots: e.target.value })}
                         className="border p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-400"
                     />
                 </div>
+
+                {/* Working Hours Input Fields */}
+                <h3 className="mt-4 text-lg font-semibold">Working Hours</h3>
+                {newDoctor.workingHours.map((hour, index) => (
+                    <div key={index} className="grid grid-cols-3 gap-4 mt-2">
+                        <input
+                            type="text"
+                            placeholder="Day (e.g., Monday)"
+                            value={hour.day}
+                            onChange={(e) => handleWorkingHoursChange(index, "day", e.target.value)}
+                            className="border p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-400"
+                        />
+                        <input
+                            type="text"
+                            placeholder="Start Time (e.g., 08:00 AM)"
+                            value={hour.startTime}
+                            onChange={(e) => handleWorkingHoursChange(index, "startTime", e.target.value)}
+                            className="border p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-400"
+                        />
+                        <input
+                            type="text"
+                            placeholder="End Time (e.g., 05:00 PM)"
+                            value={hour.endTime}
+                            onChange={(e) => handleWorkingHoursChange(index, "endTime", e.target.value)}
+                            className="border p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-400"
+                        />
+                    </div>
+                ))}
+                <button
+                    onClick={addWorkingHourField}
+                    className="mt-2 bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg transition duration-200"
+                >
+                    Add Another Working Hour
+                </button>
+
                 <button
                     onClick={handleAddDoctor}
                     className="mt-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg w-full transition duration-200"
@@ -113,8 +176,16 @@ export default function ManageDoctors() {
                             className="bg-gray-50 p-4 rounded-lg shadow flex justify-between items-center border"
                         >
                             <div>
-                                <p className="text-lg font-semibold text-gray-800">{doctor.name} - {doctor.specialty}</p>
-                                <p className="text-gray-600">Available Hours: {doctor.availableHours}</p>
+                                <p className="text-lg font-semibold text-gray-800">{doctor.name} - {doctor.specialization}</p>
+                                <p className="text-gray-600">Available Slots: {doctor.availableSlots.join(", ")}</p>
+                                <p className="text-gray-600">Working Hours:</p>
+                                <ul className="text-gray-600">
+                                    {doctor.workingHours.map((hour, idx) => (
+                                        <li key={idx}>
+                                            {hour.day}: {hour.startTime} - {hour.endTime}
+                                        </li>
+                                    ))}
+                                </ul>
                             </div>
                             <button
                                 onClick={() => handleDeleteDoctor(doctor._id)}
