@@ -1,15 +1,13 @@
-import dbConnect from "../../lib/mongodb"; // Ensure database connection
-import Booking from "../../models/Booking"; // Import the Booking model
-import User from "../../models/User" //import user model
-import { sendSms } from "../../utils/sendSms"; // import sms function
+import dbConnect from "../../lib/mongodb";
+import Booking from "../../models/Booking";
+import User from "../../models/User";
 import Doctor from "../../models/Doctors";
+import NotifiedPatient from "../../models/NotifiedPatient";
+import { sendSms } from "../../utils/sendSms";
 import moment from "moment";
 
 export default async function handler(req, res) {
-    console.log("SENDING REMINDERS");
-  if (req.method !== "POST") {
-    //return res.status(405).json({ error: "Method Not Allowed" });
-  }
+  console.log("SENDING REMINDERS");
 
   await dbConnect();
   console.log("Connecting to the Database");
@@ -18,7 +16,6 @@ export default async function handler(req, res) {
     const tomorrow = moment().add(1, "days").startOf("day").toDate();
     const endOfTomorrow = moment().add(1, "days").endOf("day").toDate();
 
-    // Fetch appointments happening tomorrow
     const bookings = await Booking.find({
       date: { $gte: tomorrow, $lt: endOfTomorrow },
     }).populate("doctor");
@@ -27,59 +24,42 @@ export default async function handler(req, res) {
       return res.status(200).json({ message: "No appointments for tomorrow." });
     }
 
-    // Send SMS notifications
     for (const booking of bookings) {
-        console.log("Processing booking ID:", booking._id);
+      console.log("Processing booking ID:", booking._id);
 
-        const { userId, doctor, description, date } = booking;
+      const { userId, doctor, description, date } = booking;
+      const user = await User.findById(userId);
 
-        // Fetch the user's phone number from the User collection
-        const user = await User.findById(userId);
-
-        if (!user || !user.phoneNumber) {
-            console.warn(`No phone number found for user ID: ${userId}`);
-            continue;
-        }
-
-        const phoneNumber = user.phoneNumber; // User's phone number
-
-      if (!phoneNumber) {
-        console.warn(`No phone number found for booking ID: ${booking._id}`);
+      if (!user || !user.phoneNumber) {
+        console.warn(`No phone number found for user ID: ${userId}`);
         continue;
       }
 
-     if (!phoneNumber.includes('+')){
-        const newphoneNumber = '+' + phoneNumber;
-        const message = `Reminder: Your appointment with Dr. ${doctor.name} is scheduled for ${moment(date).format(
-            "MMMM Do YYYY"
-          )}. Details: ${description || "No description provided."}`;
-    
-          console.log(`Sending reminder to: ${newphoneNumber}`);
-    
-          await sendSms(newphoneNumber, message);
+      const phoneNumber = user.phoneNumber.startsWith("+")
+        ? user.phoneNumber
+        : `+${user.phoneNumber}`;
 
+      const message = `Reminder: Your appointment with Dr. ${doctor.name} is scheduled for ${moment(
+        date
+      ).format("MMMM Do YYYY")}. Details: ${description || "No description provided."}`;
 
-     } else if (phoneNumber.includes('+')){
-        const message = `Reminder: Your appointment with Dr. ${doctor.name} is scheduled for ${moment(date).format(
-            "MMMM Do YYYY"
-          )}. Details: ${description || "No description provided."}`;
-    
-          console.log(`Sending reminder to: ${phoneNumber}`);
-    
-          await sendSms(phoneNumber, message);
-     }
+      console.log(`Sending reminder to: ${phoneNumber}`);
 
-      
+      await sendSms(phoneNumber, message);
 
-      //console.log("Sending reminder to:", phoneNumber);
-      //alert("Sending reminder to:" + phoneNumber + "Message is: " + message);
-
-      //await sendSms(phoneNumber, message);
+      // Log the notified patient in the database
+      await NotifiedPatient.create({
+        userId,
+        name: user.name,
+        phoneNumber,
+        doctorName: doctor.name,
+        appointmentDate: date,
+        description,
+      });
     }
 
-    res.status(200).json({ message: "Reminders sent successfully." });
-    console.log("Reminders sent successfully.");
-    
+    res.status(200).json({ message: "Reminders sent and logged successfully." });
+    console.log("Reminders sent and logged successfully.");
   } catch (error) {
     console.error("Error sending reminders:", error);
     res.status(500).json({ error: "Failed to send reminders." });

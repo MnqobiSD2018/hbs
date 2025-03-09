@@ -3,6 +3,7 @@ import { useRouter } from "next/router";
 import ManageDoctors from "@/components/ManageDoctors";
 import Appointments from "@/components/Appointments";
 import Patients from "@/components/Patients";
+import NotifiedPatients from "@/components/NotifiedPatients";
 
 export default function AdminDashboard() {
     const [activeTab, setActiveTab] = useState("doctors");
@@ -49,6 +50,12 @@ export default function AdminDashboard() {
                     active={activeTab === "patients"} 
                     onClick={() => setActiveTab("patients")} 
                 />
+                <SidebarItem 
+                    label="Notified Patients" 
+                    active={activeTab === "patientnotifications"} 
+                    onClick={() => setActiveTab("patientnotifications")} 
+                />
+
             </ul>
 
             <button
@@ -64,6 +71,7 @@ export default function AdminDashboard() {
             {activeTab === "doctors" && <ManageDoctors />}
             {activeTab === "appointments" && <Appointments />}
             {activeTab === "patients" && <Patients />}
+            {activeTab === "patientnotifications" && <NotifiedPatients />}
         </div>
     </div>
 );
