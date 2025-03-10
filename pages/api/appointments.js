@@ -3,6 +3,7 @@ import { authOptions } from "./auth/[...nextauth]"; // Import NextAuth settings
 import dbConnect from "../../lib/mongodb";
 import Appointment from "../../models/Appointments";
 import Doctor from "../../models/Doctors";
+import User from "../../models/User";
 import Appointments from "../../models/Booking";
 
 export default async function handler(req, res) {
@@ -41,8 +42,14 @@ export default async function handler(req, res) {
       res.status(500).json({ error: "Failed to book appointment" });
     } 
     } else if (req.method === "GET") {
+
+
       try {
-        const appointments = await Appointments.find({ appointmentType: "General Checkup" }); 
+
+        const appointments = await Appointments.find({ appointmentType: "General Checkup" })
+          .populate("userId", "name") // Fetch user's name
+          .populate("doctor", "name"); // Fetch doctor's name
+        
         res.status(200).json(appointments);
       } catch (error) {
         console.log("An error occured: ", error.message);
