@@ -43,7 +43,6 @@ export default async function handler(req, res) {
     } else if (req.method === "GET") {
       try {
         const appointments = await Appointments.find({ appointmentType: "General Checkup" }); 
-        console.log(appointments);
         res.status(200).json(appointments);
       } catch (error) {
         console.log("An error occured: ", error.message);

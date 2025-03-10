@@ -182,7 +182,7 @@ export default function BookingHistory() {
                     onClick={() => handleDelete(booking._id)}
                     className="bg-red-500 text-white p-2 rounded mt-2 ml-2"
                   >
-                    Delete
+                    Cancel Appointment
                   </button>
                 </>
               )}

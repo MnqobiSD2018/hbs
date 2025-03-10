@@ -24,8 +24,31 @@ export default async function handler(req, res) {
       return res.status(500).json({ success: false, error: "Failed to fetch bookings" });
     }
   } 
-  else if (req.method === "POST") { // This was unreachable before! Check Github Commit History
+  else if (req.method === "POST") { 
+    
     try {
+      const { userId, appointmentType, doctor, date, time, description, nextOfKin } = req.body;
+
+      // Check if the selected time slot is still available
+      const doctorData = await Doctor.findById(doctor);
+      if (!doctorData || !doctorData.availableSlots.includes(time)) {
+          return res.status(400).json({ error: "Time slot unavailable. Please choose another." });
+      }
+
+      // Create a new booking
+      const newBooking = await Booking.create({ userId, appointmentType, doctor, date, time, description, nextOfKin });
+
+      // Remove the booked time slot
+      await Doctor.findByIdAndUpdate(doctor, { $pull: { availableSlots: time } });
+
+      res.status(201).json(newBooking);
+  } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Booking failed" });
+  }
+    
+    // This was unreachable before! Check Github Commit History
+    /**try {
       const { appointmentType, doctor, date, time, description, nextOfKin, userId } = req.body;
 
       if (!appointmentType || !doctor || !date || !time || !description || !userId) {
@@ -53,9 +76,26 @@ export default async function handler(req, res) {
     } catch (error) {
       console.error("Booking Error:", error);
       return res.status(500).json({ error: "Failed to create booking" });
-    }
-  } 
-  else {
+    } */
+    
+  } else if (req.method === "DELETE") {
+    try {
+      const { bookingId } = req.body;
+
+      const booking = await Booking.findById(bookingId);
+      if (!booking) return res.status(404).json({ error: "Booking not found" });
+
+      // Restore the canceled time slot
+      await Doctor.findByIdAndUpdate(booking.doctor, { $push: { availableSlots: booking.time } });
+
+      // Delete the booking
+      await Booking.findByIdAndDelete(bookingId);
+
+      res.status(200).json({ message: "Appointment canceled, slot restored" });
+  } catch (error) {
+      res.status(500).json({ error: "Cancellation failed" });
+  }
+  } else {
     res.setHeader("Allow", ["GET", "POST"]);
     return res.status(405).json({ error: `Method ${req.method} Not Allowed` });
   }

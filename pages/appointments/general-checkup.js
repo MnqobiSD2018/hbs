@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 
 export default function GeneralCheckup() {
+    const [availableSlots, setAvailableSlots] = useState([]);
     const [doctors, setDoctors] = useState([]);
     const [formData, setFormData] = useState({
         date: "",
@@ -26,6 +27,14 @@ export default function GeneralCheckup() {
         };
         fetchDoctors();
     }, []);
+
+    const handleDoctorChange = async (doctorId) => {
+        setFormData({ ...formData, doctor: doctorId });
+        //selectedDoctor(doctorId);
+        // Fetch available slots for selected doctor
+        const selectedDoctor = doctors.find((doc) => doc._id === doctorId);
+        setAvailableSlots(selectedDoctor?.availableSlots || []);
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -67,6 +76,24 @@ export default function GeneralCheckup() {
                 <h1 className="text-3xl font-bold text-center text-blue-600 mb-6">Book a General Checkup</h1>
 
                 <form onSubmit={handleSubmit} className="space-y-4">
+
+                <div className="flex flex-col">
+                        <label className="text-gray-700 font-medium">Doctor</label>
+                        <select
+                            value={formData.doctor}
+                            onChange={(e) => handleDoctorChange(e.target.value)}
+                            className="border p-3 rounded-lg w-full focus:ring focus:ring-blue-300"
+                            required
+                        >
+                            <option value="">Select a Doctor</option>
+                            {doctors.map((doctor) => (
+                                <option key={doctor._id} value={doctor._id}>
+                                    {doctor.name} ({doctor.specialty})
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+
                     <div className="flex flex-col">
                         <label className="text-gray-700 font-medium">Date of Appointment</label>
                         <input
@@ -80,32 +107,22 @@ export default function GeneralCheckup() {
 
                     <div className="flex flex-col">
                         <label className="text-gray-700 font-medium">Time of Appointment</label>
-                        <input
-                            type="time"
+                        <select
                             value={formData.time}
                             onChange={(e) => setFormData({ ...formData, time: e.target.value })}
                             className="border p-3 rounded-lg w-full focus:ring focus:ring-blue-300"
                             required
-                        />
-                    </div>
-
-                    <div className="flex flex-col">
-                        <label className="text-gray-700 font-medium">Doctor</label>
-                        <select
-                            value={formData.doctor}
-                            onChange={(e) => setFormData({ ...formData, doctor: e.target.value })}
-                            className="border p-3 rounded-lg w-full focus:ring focus:ring-blue-300"
-                            required
                         >
-                            <option value="">Select a Doctor</option>
-                            {doctors.map((doctor) => (
-                                <option key={doctor._id} value={doctor._id}>
-                                    {doctor.name} ({doctor.specialty})
-                                </option>
-                            ))}
+                            <option value="">Select a Time Slot</option>
+                                {availableSlots.map((slot, index) => (
+                            <option key={index} value={slot}>
+                                {slot}
+                            </option>
+                         ))}
                         </select>
                     </div>
 
+                    
                     <div className="flex flex-col">
                         <label className="text-gray-700 font-medium">Description of Checkup</label>
                         <textarea
