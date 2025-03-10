@@ -53,6 +53,7 @@ export default function GeneralCheckup() {
         };
 
         try {
+            // Call API to create booking and update doctor's available slots
             const response = await fetch("/api/bookings", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -61,6 +62,7 @@ export default function GeneralCheckup() {
 
             if (response.ok) {
                 alert("Booking successful!");
+                setAvailableSlots((prevSlots) => prevSlots.filter(slot => slot !== formData.time));
                 setFormData({ date: "", time: "", doctor: "", description: "", nextOfKinName: "", nextOfKinPhone: "" });
             } else {
                 alert("Booking failed. Try again.");

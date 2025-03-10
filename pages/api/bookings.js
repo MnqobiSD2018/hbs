@@ -23,60 +23,53 @@ export default async function handler(req, res) {
       console.error("Error fetching bookings:", error);
       return res.status(500).json({ success: false, error: "Failed to fetch bookings" });
     }
-  } 
-  else if (req.method === "POST") { 
+  } else if (req.method === "POST") { 
     
-    try {
       const { userId, appointmentType, doctor, date, time, description, nextOfKin } = req.body;
 
-      // Check if the selected time slot is still available
-      const doctorData = await Doctor.findById(doctor);
-      if (!doctorData || !doctorData.availableSlots.includes(time)) {
-          return res.status(400).json({ error: "Time slot unavailable. Please choose another." });
-      }
+      try {
+        // Find the doctor
+        const doctorDoc = await Doctor.findById(doctor);
+        if (!doctorDoc) {
+            return res.status(404).json({ error: "Doctor not found" });
+        }
 
-      // Create a new booking
-      const newBooking = await Booking.create({ userId, appointmentType, doctor, date, time, description, nextOfKin });
+        // Check if the time slot is available
+        if (!doctorDoc.availableSlots.includes(time)) {
+            return res.status(400).json({ error: "Time slot is not available" });
+        }
 
-      // Remove the booked time slot
-      await Doctor.findByIdAndUpdate(doctor, { $pull: { availableSlots: time } });
+        // Create a new booking
+        const newBooking = new Booking({
+            userId,
+            appointmentType,
+            doctor,
+            date,
+            time,
+            description,
+            nextOfKin,
+        });
 
-      res.status(201).json(newBooking);
+        // Save the booking to the database
+        await newBooking.save();
+
+        // Remove the booked time slot from the availableSlots
+        doctorDoc.availableSlots = doctorDoc.availableSlots.filter(slot => slot !== time);
+        doctorDoc.appointmentsBooked.push({
+            patientId: userId,
+            date,
+            time,
+        });
+
+        // Save the updated doctor document
+        await doctorDoc.save();
+
+        res.status(201).json({ message: "Booking successful!" });
+      
   } catch (error) {
       console.error(error);
       res.status(500).json({ error: "Booking failed" });
-  }
-    
-    // This was unreachable before! Check Github Commit History
-    /**try {
-      const { appointmentType, doctor, date, time, description, nextOfKin, userId } = req.body;
-
-      if (!appointmentType || !doctor || !date || !time || !description || !userId) {
-        return res.status(400).json({ error: "All fields are required" });
-      }
-
-      // Ensure doctor is stored as ObjectId
-      const doctorExists = await Doctor.findById(doctor);
-      if (!doctorExists) {
-        return res.status(400).json({ error: "Doctor not found" });
-      }
-      
-      const newBooking = new Booking({
-        userId,
-        appointmentType,
-        doctor,
-        date,
-        time,
-        description,
-        nextOfKin,
-      });
-
-      await newBooking.save();
-      return res.status(201).json({ message: "Booking successful", booking: newBooking });
-    } catch (error) {
-      console.error("Booking Error:", error);
-      return res.status(500).json({ error: "Failed to create booking" });
-    } */
+  } 
     
   } else if (req.method === "DELETE") {
     try {
@@ -172,3 +165,56 @@ res.status(405).json({ error: "Method not allowed" });
   }*/
 
 
+
+
+
+
+     // This was unreachable before! Check Github Commit History
+    /**try {
+      const { appointmentType, doctor, date, time, description, nextOfKin, userId } = req.body;
+
+      if (!appointmentType || !doctor || !date || !time || !description || !userId) {
+        return res.status(400).json({ error: "All fields are required" });
+      }
+
+      // Ensure doctor is stored as ObjectId
+      const doctorExists = await Doctor.findById(doctor);
+      if (!doctorExists) {
+        return res.status(400).json({ error: "Doctor not found" });
+      }
+      
+      const newBooking = new Booking({
+        userId,
+        appointmentType,
+        doctor,
+        date,
+        time,
+        description,
+        nextOfKin,
+      });
+
+      await newBooking.save();
+      return res.status(201).json({ message: "Booking successful", booking: newBooking });
+    } catch (error) {
+      console.error("Booking Error:", error);
+      return res.status(500).json({ error: "Failed to create booking" });
+    } */
+
+
+
+
+
+
+       /**  Check if the selected time slot is still available
+      const doctorData = await Doctor.findById(doctor);
+      if (!doctorData || !doctorData.availableSlots.includes(time)) {
+          return res.status(400).json({ error: "Time slot unavailable. Please choose another." });
+      }
+
+      // Create a new booking
+      const newBooking = await Booking.create({ userId, appointmentType, doctor, date, time, description, nextOfKin });
+
+      // Remove the booked time slot
+      await Doctor.findByIdAndUpdate(doctor, { $pull: { availableSlots: time } });
+
+      res.status(201).json(newBooking); */
