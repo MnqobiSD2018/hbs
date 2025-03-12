@@ -3,6 +3,9 @@ import axios from "axios";
 
 export default function Appointments() {
   const [appointments, setAppointments] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState("");
+
 
   useEffect(() => {
     fetchAppointments();
@@ -15,6 +18,31 @@ export default function Appointments() {
     } catch (error) {
       console.error("Error fetching appointments:", error);
     }
+  };
+
+  const notifyPatients = async () => {
+
+    setLoading(true);
+
+    setMessage("");
+
+    try {
+
+      const { data } = await axios.post("/api/send-reminders");
+
+      setMessage(data.message);
+      alert("Messages sent successfully");
+
+    } catch (error) {
+
+      setMessage("Failed to send reminders. Please try again.");
+
+      console.error("Error sending reminders:", error);
+
+    }
+
+    setLoading(false);
+
   };
 
   const currentDateTime = new Date(); // Get current date and time
@@ -34,6 +62,15 @@ export default function Appointments() {
 
       {/* Upcoming Appointments */}
       <div className="bg-white p-6 rounded-lg shadow-md mb-6">
+        
+        {/* Notify Patients Button */}
+      <button 
+        className="bg-blue-500 text-white px-4 py-2 rounded-md mb-4 hover:bg-blue-600 transition"
+        onClick={notifyPatients}
+        disabled={loading}
+        >{loading ? "Sending..." : "Notify Patients"}
+      </button>
+
         <h3 className="text-xl font-semibold mb-4 text-gray-800">Upcoming Appointments</h3>
         <div className="overflow-x-auto">
           <table className="w-full border-collapse border border-gray-200">
