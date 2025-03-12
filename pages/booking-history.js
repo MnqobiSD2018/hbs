@@ -165,7 +165,7 @@ export default function BookingHistory() {
               ) : (
                 <>
                   <p><strong>Appointment Type:</strong> {booking.appointmentType}</p>
-                  <p><strong>Doctor:</strong> {booking.doctor?.name || "Unknown"} ({booking.doctor?.specialty || "N/A"})</p>
+                  <p><strong>Doctor:</strong> {booking.doctor?.name || "Unknown"}</p>
                   <p><strong>Date:</strong> {booking.date}</p>
                   <p><strong>Time:</strong> {booking.time}</p>
                   {booking.description && <p><strong>Description:</strong> {booking.description}</p>}

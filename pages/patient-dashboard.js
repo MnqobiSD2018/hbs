@@ -79,10 +79,10 @@ export default function PatientDashboard() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full max-w-4xl mt-6">
                     {[
-                        { label: "General Checkup", color: "bg-blue-500", path: "./appointments/general-checkup" },
-                        { label: "Specialist Visit", color: "bg-green-500", path: "./appointments/specialist-visit" },
-                        { label: "Book for Someone Else", color: "bg-yellow-500", path: "./appointments/book-for-someone" },
-                        { label: "Vaccination Booking", color: "bg-purple-500", path: "./appointments/vaccination" },
+                        { label: "Book Appointment", color: "bg-blue-500", path: "./appointments/general-checkup" },
+                        //{ label: "Specialist Visit", color: "bg-green-500", path: "./appointments/specialist-visit" },
+                        //{ label: "Book for Someone Else", color: "bg-yellow-500", path: "./appointments/book-for-someone" },
+                        //{ label: "Vaccination Booking", color: "bg-purple-500", path: "./appointments/vaccination" },
                         { label: "Settings", color: "bg-gray-500", path: "/patient-settings" },
                         { label: "View Booking History", color: "bg-gray-600", path: "/booking-history" },
                     ].map((item, index) => (

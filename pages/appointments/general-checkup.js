@@ -75,7 +75,7 @@ export default function GeneralCheckup() {
     return (
         <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
             <div className="max-w-lg w-full bg-white p-6 rounded-lg shadow-lg">
-                <h1 className="text-3xl font-bold text-center text-blue-600 mb-6">Book a General Checkup</h1>
+                <h1 className="text-3xl font-bold text-center text-blue-600 mb-6">Book Appointment</h1>
 
                 <form onSubmit={handleSubmit} className="space-y-4">
 
@@ -90,7 +90,7 @@ export default function GeneralCheckup() {
                             <option value="">Select a Doctor</option>
                             {doctors.map((doctor) => (
                                 <option key={doctor._id} value={doctor._id}>
-                                    {doctor.name} ({doctor.specialty})
+                                    {doctor.name} ({doctor.specialization})
                                 </option>
                             ))}
                         </select>
