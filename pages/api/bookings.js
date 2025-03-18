@@ -8,36 +8,43 @@ export default async function handler(req, res) {
 
   if (req.method === "GET") {
     try {
-      const { userId } = req.query;
-      if (!userId) {
-        return res.status(400).json({ error: "User ID is required" });
+      const { doctorId, date } = req.query;
+
+      if (!doctorId || !date) {
+          return res.status(400).json({ error: "Doctor ID and Date are required" });
       }
 
-      const bookings = await Booking.find({ userId })
-        .populate("doctor", "name specialty") // Fetch doctor details
-        .sort({ date: -1 });
+      // Fetch only the bookings for the selected doctor and date
+      const bookings = await Booking.find({ doctor: doctorId, date }).select("time");
 
-      console.log("Bookings with populated doctors:", bookings);  // Add this log
-      return res.status(200).json({ success: true, data: bookings });
-    } catch (error) {
-      console.error("Error fetching bookings:", error);
-      return res.status(500).json({ success: false, error: "Failed to fetch bookings" });
-    }
+      return res.status(200).json({ success: true, bookings });
+  } catch (error) {
+      console.error("Error fetching booked slots:", error);
+      return res.status(500).json({ success: false, error: "Failed to fetch booked slots" });
+  }
   } else if (req.method === "POST") { 
     
-      const { userId, appointmentType, doctor, date, time, description, nextOfKin } = req.body;
+    const { userId, appointmentType, doctor, date, time, description, nextOfKin } = req.body;
 
-      try {
+    try {
         // Find the doctor
-        const doctorDoc = await Doctor.findById(doctor);
-        if (!doctorDoc) {
-            return res.status(404).json({ error: "Doctor not found" });
+        const doctorRecord = await Doctor.findById(doctor);
+        if (!doctorRecord) {
+            return res.status(404).json({ message: "Doctor not found" });
         }
 
-        // Check if the time slot is available
-        if (!doctorDoc.availableSlots.includes(time)) {
-            return res.status(400).json({ error: "Time slot is not available" });
+        // Check if the selected time is already booked for the selected date
+        const isAlreadyBooked = doctorRecord.appointmentsBooked.some(
+            (appointment) => appointment.date === date && appointment.time === time
+        );
+
+        if (isAlreadyBooked) {
+            return res.status(400).json({ message: "Time slot already booked" });
         }
+
+        // Add the new appointment to appointmentsBooked (DO NOT REMOVE FROM availableSlots)
+        doctorRecord.appointmentsBooked.push({ patientId: userId, date, time });
+        await doctorRecord.save();
 
         // Create a new booking
         const newBooking = new Booking({
@@ -50,22 +57,9 @@ export default async function handler(req, res) {
             nextOfKin,
         });
 
-        // Save the booking to the database
         await newBooking.save();
 
-        // Remove the booked time slot from the availableSlots
-        doctorDoc.availableSlots = doctorDoc.availableSlots.filter(slot => slot !== time);
-        doctorDoc.appointmentsBooked.push({
-            patientId: userId,
-            date,
-            time,
-        });
-
-        // Save the updated doctor document
-        await doctorDoc.save();
-
-        res.status(201).json({ message: "Booking successful!" });
-      
+        res.status(201).json({ message: "Booking successful!" });   
   } catch (error) {
       console.error(error);
       res.status(500).json({ error: "Booking failed" });
