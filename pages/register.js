@@ -86,9 +86,10 @@ export default function Register() {
             required
           />
           <select
-            className="p-2 border rounded mb-2"
+            className="p-2 border rounded mb-2 visibility: hidden"
             value={role}
             onChange={(e) => setRole(e.target.value)}
+
           >
             <option value="patient">Patient</option>
             <option value="admin">Admin</option>
