@@ -8,21 +8,20 @@ export default async function handler(req, res) {
 
   if (req.method === "GET") {
     try {
-      const { userId } = req.query;
-      if (!userId) {
-        return res.status(400).json({ error: "User ID is required" });
+      const { doctorId, date } = req.query;
+
+      if (!doctorId || !date) {
+          return res.status(400).json({ error: "Doctor ID and Date are required" });
       }
 
-      const bookings = await Booking.find({ userId })
-        .populate("doctor", "name specialty") // Fetch doctor details
-        .sort({ date: -1 });
+      // Fetch only the bookings for the selected doctor and date
+      const bookings = await Booking.find({ doctor: doctorId, date }).select("time");
 
-      console.log("Bookings with populated doctors:", bookings);  // Add this log
-      return res.status(200).json({ success: true, data: bookings });
-    } catch (error) {
-      console.error("Error fetching bookings:", error);
-      return res.status(500).json({ success: false, error: "Failed to fetch bookings" });
-    }
+      return res.status(200).json({ success: true, bookings });
+  } catch (error) {
+      console.error("Error fetching booked slots:", error);
+      return res.status(500).json({ success: false, error: "Failed to fetch booked slots" });
+  }
   } else if (req.method === "POST") { 
     
       const { userId, appointmentType, doctor, date, time, description, nextOfKin } = req.body;

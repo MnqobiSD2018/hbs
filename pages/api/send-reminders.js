@@ -20,6 +20,7 @@ export default async function handler(req, res) {
       date: { $gte: tomorrow, $lt: endOfTomorrow },
     }).populate("doctor");
 
+
     if (bookings.length === 0) {
       return res.status(200).json({ message: "No appointments for tomorrow." });
     }
