@@ -17,7 +17,7 @@ export default function BookingHistory() {
           return;
         }
 
-        const res = await fetch(`/api/bookings?userId=${storedUser.id}`, {
+        const res = await fetch(`/api/booking-history?userId=${storedUser.id}`, {
           headers: { "Cache-Control": "no-cache, no-store, must-revalidate" },
         });
 
